@@ -2,11 +2,15 @@
 @section('title','Register')
 @section('content')
 
- 
    <div class="limiter">
       <div class="container-login100">
         <div class="wrap-login100">
           <div class="login100-form-title">
+            @if(session()->has('message'))
+               <div class="alert alert-success">
+                 {{ session()->get('message') }}
+               </div>
+           @endif
             <span class="login100-form-title-1">
               Register
             </span>
@@ -16,7 +20,7 @@
             @csrf
             <div class="wrap-input100 validate-input m-b-26" data-validate="Firstname is required">
                   <span class="label-input100">Name</span>
-                  <input class="input100" type="text" name="name" placeholder="Enter Name">
+                  <input class="input100" type="text" name="name" placeholder="Enter Name" value="{{ old('name') }}">
                   <span class="focus-input100"></span>
                   
             </div>
@@ -30,7 +34,7 @@
 
            <div class="wrap-input100 validate-input m-b-26" data-validate="Email is required">
               <span class="label-input100">Email</span>
-              <input class="input100" type="text" name="email" placeholder="Enter email">
+              <input class="input100" type="text" name="email" placeholder="Enter email" value="{{ old('email') }}">
               <span class="focus-input100"></span>
                
            </div>

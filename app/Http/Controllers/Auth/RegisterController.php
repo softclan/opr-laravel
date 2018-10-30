@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 
 
 class RegisterController extends Controller
@@ -48,6 +49,32 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
+    protected function register(Request $request)
+    {
+        /** @var User $user */
+       $validator = $this->validator($request->all());
+
+       if($validator->fails()){
+
+        return redirect()->back()
+                ->withInput()
+                 ->withErrors($validator) ;// send back all errors to the login form
+                 // send back the input (not the password) so that we can repopulate the form
+       }
+
+       $validatedData = $request->all();
+        try {
+            $validatedData['password']        = bcrypt(array_get($validatedData, 'password'));
+            $validatedData['activation_code'] = str_random(30).time();
+            $user                             = app(User::class)->create($validatedData);
+            
+        } catch (\Exception $exception) {
+            logger()->error($exception);
+            return redirect()->back()->with('message', 'Unable to create new user.');
+        }
+        $user->notify(new UserRegisteredSuccessfully($user));
+        return redirect()->back()->with('message', 'Successfully created a new account. Please check your email and activate your account.');
+    }
     protected function validator(array $data)
     {
 
@@ -64,18 +91,10 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\User
      */
-    protected function create(array $data)
+    protected function rules( )
     {
         
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'activation_code' =>  str_random(30).time(),
-        ]);
-
-         $user->notify(new UserRegisteredSuccessfully($user));
-        return redirect()->back()->with('message', 'Successfully created a new account. Please check your email and activate your account.');
+        
     }
 
     public function activateUser(string $activationCode)
@@ -86,7 +105,7 @@ class RegisterController extends Controller
             if (!$user) {
                 return "The code does not exist for any user in our system.";
             }
-            $user->status          = 1;
+            $user->activation = 1;
             $user->activation_code = null;
             $user->save();
             auth()->login($user);
@@ -94,7 +113,7 @@ class RegisterController extends Controller
             logger()->error($exception);
             return "Whoops! something went wrong.";
         }
-        return redirect()->to('/home');
+        return redirect()->to('/');
     
    }
 

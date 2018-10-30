@@ -18,9 +18,9 @@ use Illuminate\Http\Request;
 
 Route::get('/', 'PostsController@index')->name('home');
 
-Route::get('/login', function () {
-    return view('login');
-});
+
+
+Route::post('/login', 'Auth\LoginController@login');
 
 Route::get('/logout', 'Auth\LoginController@logout');
 
@@ -28,6 +28,10 @@ Route::get('/verify-user/{code}', 'Auth\RegisterController@activateUser')->name(
 
 Route::get('/welcome', function () {
     return view('welcome');
+});
+
+Route::get('/login', function () {
+    return view('login');
 });
 
 Route::get('/register', function () {

@@ -51,6 +51,8 @@ class LoginController extends Controller
     }
 
 
+
+
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -58,22 +60,13 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
 
           
-            //return redirect()->route('home');
+            return redirect()->route('home');
         }
 
-        redirect()->back()->withErrors();
+        return redirect()->back()->with(['message'=>'Login failed make sure your credentials are correct']);
     }
 
 
-    public function login1() {
-        
-        if(Auth::check()) {
-           Auth::logout(); 
-        }
-       
-        return redirect('/');
-        
-    }
-
+    
     
 }

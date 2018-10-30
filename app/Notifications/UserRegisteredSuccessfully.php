@@ -13,6 +13,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 class UserRegisteredSuccessfully extends Notification
 {
     use Queueable;
+    protected $user;
 
     /**
      * Create a new notification instance.
@@ -47,6 +48,7 @@ class UserRegisteredSuccessfully extends Notification
         $user = $this->user;
         return (new MailMessage)
             ->from(env('ADMIN_MAIL'))
+           // ->to($this->user()->email)
             ->subject('Successfully created new account')
             ->greeting(sprintf('Hello %s', $user->name))
             ->line('You have successfully registered to our system. Please activate your account.')
